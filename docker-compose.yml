@@ -3,10 +3,14 @@ services:
   botman:
     restart: unless-stopped
     build:
-      context: .
+      context: botman
       dockerfile: Dockerfile
+    env_file:
+      - .env
+    container_name: botman
     environment:
         DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+        DISCORD_BOT_OWNER_ID: ${DISCORD_BOT_OWNER_ID}
         LAVALINK_SERVER_PASSWORD: ${LAVALINK_SERVER_PASSWORD}
         LAVALINK_SERVER_HOST: lavalink
         LAVALINK_SERVER_PORT: 2333
@@ -16,18 +20,22 @@ services:
       - lavalink
 
   lavalink:
-    image: ghcr.io/lavalink-devs/lavalink:4.0.8
-    container_name: lavalink
     restart: unless-stopped
+    build:
+      context: lavalink
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    container_name: lavalink
     environment:
-      - _JAVA_OPTIONS=-Xmx2G -Djsse.enableCBCProtection=false -Dcom.sun.net.ssl.checkRevocation=false -Djavax.net.ssl.trustStoreType=KeychainStore
+      - _JAVA_OPTIONS=-Xmx2G
       - SERVER_PORT=2333
       - LAVALINK_SERVER_PASSWORD=${LAVALINK_SERVER_PASSWORD}
       - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
       - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
     volumes:
-      - ./lavalink_application.yml:/opt/Lavalink/application.yml
-      - ./plugins/:/opt/Lavalink/plugins/:rw
+      - ./lavalink/lavalink_application.yml:/opt/Lavalink/application.yml
+      - ./lavalink/plugins/:/opt/Lavalink/plugins/
     networks:
       - lavalink
     expose:

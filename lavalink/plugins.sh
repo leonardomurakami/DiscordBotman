@@ -1,0 +1,3 @@
+sudo wget https://maven.lavalink.dev/releases/com/github/topi314/lavasrc/lavasrc-plugin/4.3.0/lavasrc-plugin-4.3.0.jar -P ./plugins/
+sudo wget https://maven.lavalink.dev/releases/com/github/topi314/lavasearch/lavasearch-plugin/1.0.0/lavasearch-plugin-1.0.0.jar -P ./plugins/
+sudo wget -O ./plugins/plugin.jar https://github.com/lavalink-devs/youtube-source/releases/download/1.8.3/youtube-plugin-1.8.3.jar 

@@ -32,3 +32,6 @@ plugins/
 
 # PYC
 *.pyc
+
+# Env
+.env
