@@ -1,0 +1,1 @@
+SNIPE_TIMEOUT = 10

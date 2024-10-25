@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+  botman:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+        DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+        LAVALINK_SERVER_PASSWORD: ${LAVALINK_SERVER_PASSWORD}
+        LAVALINK_SERVER_HOST: lavalink
+        LAVALINK_SERVER_PORT: 2333
+    depends_on: 
+      - lavalink
+    networks:
+      - lavalink
+
+  lavalink:
+    image: ghcr.io/lavalink-devs/lavalink:4.0.8
+    container_name: lavalink
+    restart: unless-stopped
+    environment:
+      - _JAVA_OPTIONS=-Xmx2G -Djsse.enableCBCProtection=false -Dcom.sun.net.ssl.checkRevocation=false -Djavax.net.ssl.trustStoreType=KeychainStore
+      - SERVER_PORT=2333
+      - LAVALINK_SERVER_PASSWORD=${LAVALINK_SERVER_PASSWORD}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+    volumes:
+      - ./lavalink_application.yml:/opt/Lavalink/application.yml
+      - ./plugins/:/opt/Lavalink/plugins/:rw
+    networks:
+      - lavalink
+    expose:
+      - 2333
+    ports:
+      - "2333:2333"
+
+networks:
+  lavalink:
+    driver: bridge
