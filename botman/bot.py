@@ -1,12 +1,15 @@
 import os
 import miru
+import time
 import hikari
+import ongaku
 import logging
 import datetime
 import lightbulb
 import traceback
 
 from help import HelpCommand
+from handlers.session import RetrySessionHandler
 
 bot = lightbulb.BotApp(
     token=os.getenv("DISCORD_BOT_TOKEN", ""),
@@ -16,6 +19,13 @@ bot = lightbulb.BotApp(
     owner_ids=[int(os.getenv("DISCORD_BOT_OWNER_ID", "0"))]
 )
 bot.d.miru = miru.Client(bot)
+bot.d.ongaku = ongaku.Client(bot, session_handler=RetrySessionHandler)
+bot.d.ongaku.create_session(
+    name="default-session",
+    host=os.getenv("LAVALINK_SERVER_HOST", "lavalink"),
+    port=int(os.getenv("LAVALINK_SERVER_PORT", 2333)),
+    password=os.getenv("LAVALINK_SERVER_PASSWORD", "youshallnotpass"),
+)
 bot.d.deleted_messages = {}
 bot.d.edited_messages = {}
 
@@ -23,10 +33,12 @@ logger = logging.getLogger(__name__)
 # Load command modules
 bot.load_extensions_from("./commands")
 
+
+
 @bot.listen(hikari.StartedEvent)
 async def on_started(event):
     logger.info("Bot has started!")
-
+        
 @bot.listen(lightbulb.CommandErrorEvent)
 async def on_error(event: lightbulb.CommandErrorEvent) -> None:
     if isinstance(event.exception, lightbulb.CommandNotFound):

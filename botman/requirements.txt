@@ -1,5 +1,5 @@
-hikari==2.1.0
-hikari-lightbulb==2.3.5.post1
+hikari==2.0.0
+hikari-lightbulb==2.3.5
 hikari-miru==4.2.0
+hikari-ongaku==1.0.3
 psutil==6.1.0
-lavalink==5.9.0

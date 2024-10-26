@@ -1,6 +1,7 @@
 import lightbulb
 import hikari
 import random
+import asyncio
 
 from views.rps_view import RPSView
 
@@ -87,6 +88,104 @@ async def rps(ctx: lightbulb.Context) -> None:
     if view.user_choice is None:
         embed.description = "Game timed out! Please try again."
         await message.edit(embed=embed, components=[])
+        
+@plugin.command
+@lightbulb.set_help("!wake <user> or /wake <user> - Moves a user between voice channels briefly to get their attention")
+@lightbulb.option("user", "The user to wake up", type=hikari.Member, required=True)
+@lightbulb.option("times", "Number of moves (default: 5, max: 10)", type=int, required=False, default=5)
+@lightbulb.command("wake", "Wake up a user in voice chat")
+@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+async def wake(ctx: lightbulb.Context) -> None:
+    target_user = ctx.options.user
+    target_user_voicestate = ctx.bot.cache.get_voice_state(ctx.guild_id, target_user.id)
+    times = min(max(1, ctx.options.times), 10)
+    
+    # Check if the target user is in a voice channel
+    if not target_user_voicestate:
+        embed = hikari.Embed(
+            title="Error",
+            description=f"{target_user.mention} is not in a voice channel!",
+            color=hikari.Color(0xff0000)
+        )
+        await ctx.respond(embed=embed)
+        return
+
+    # Get current voice channel
+    original_channel = target_user_voicestate.channel_id
+    
+    # Get available voice channels the user has access to
+    guild = ctx.get_guild()
+    available_channels = []
+    
+    for channel in guild.get_channels().values():
+        if isinstance(channel, hikari.GuildVoiceChannel):
+            # Check if channel is empty and user has access
+            member_count = len(ctx.bot.cache.get_voice_states_view_for_channel(
+                ctx.guild_id,
+                channel.id
+            ))
+            
+            if member_count == 0 or (member_count == 1 and target_user_voicestate.channel_id == channel.id):
+                # Check permissions
+                permissions = lightbulb.utils.permissions_in(channel, target_user)
+                if permissions & hikari.Permissions.CONNECT:
+                    available_channels.append(channel.id)
+    
+    if len(available_channels) < 2:
+        embed = hikari.Embed(
+            title="Error",
+            description="Not enough available voice channels to perform the wake command!",
+            color=hikari.Color(0xff0000)
+        )
+        await ctx.respond(embed=embed)
+        return
+    
+    embed = hikari.Embed(
+        title="Wake Command",
+        description=f"Waking up {target_user.mention}...",
+        color=hikari.Color(0x3498db)
+    )
+    await ctx.respond(embed=embed)
+    
+    # Move user between random channels
+    try:
+        for i in range(times):
+            # Remove current channel from available channels for next move
+            current_channel = target_user_voicestate.channel_id
+            temp_channels = [c for c in available_channels if c != current_channel]
+            
+            if not temp_channels:  # If somehow we run out of channels
+                break
+                
+            # Move to a random available channel
+            next_channel = random.choice(temp_channels)
+            await target_user.edit(voice_channel=next_channel)
+            await asyncio.sleep(0.5)  # Wait half a second
+        
+        # Finally, return to original channel
+        await target_user.edit(voice_channel=original_channel)
+            
+        embed = hikari.Embed(
+            title="Wake Command",
+            description=f"Successfully woke up {target_user.mention}!",
+            color=hikari.Color(0x00ff00)
+        )
+        await ctx.edit_last_response(embed=embed)
+            
+    except hikari.ForbiddenError:
+        embed = hikari.Embed(
+            title="Error",
+            description="I don't have permission to move that user!",
+            color=hikari.Color(0xff0000)
+        )
+        await ctx.edit_last_response(embed=embed)
+    except Exception as e:
+        embed = hikari.Embed(
+            title="Error",
+            description=f"An error occurred: {str(e)}",
+            color=hikari.Color(0xff0000)
+        )
+        await ctx.edit_last_response(embed=embed)
 
 def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)

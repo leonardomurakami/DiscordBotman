@@ -1,61 +1,94 @@
 import hikari
 import miru
-import lavalink
+import ongaku
+import typing
 
-from typing import List, Dict
+from typing import Literal
 
 class MusicPlayerView(miru.View):
-    def __init__(self, player: lavalink.DefaultPlayer) -> None:
+    def __init__(self, player: ongaku.Player) -> None:
         super().__init__(timeout=None)
         self.player = player
+        # Initialize play/pause button with play state
+        self._update_play_pause_button()
+        
+    @property
+    def message(self) -> typing.Optional[hikari.Message]:
+        return self._message
 
-    @miru.button(emoji="⏮️", style=hikari.ButtonStyle.PRIMARY)
-    async def previous_button(self, ctx: miru.ViewContext, button: miru.Button) -> None:
-        if not self.player.current:
+    @message.setter
+    def message(self, value: hikari.Message) -> None:
+        self._message = value
+
+    def _update_play_pause_button(self) -> None:
+        """Updates the play/pause button style and emoji based on player state"""
+        button = self.play_pause_button
+        if not self.player.is_paused:
+            button.emoji = "▶️"  # Play emoji
+            button.style = hikari.ButtonStyle.SUCCESS  # Green when ready to play
+        else:
+            button.emoji = "⏸️"  # Pause emoji
+            button.style = hikari.ButtonStyle.DANGER  # Red when ready to pause
+
+    @miru.button(emoji="⏮️", style=hikari.ButtonStyle.SECONDARY, row=0)
+    async def restart_button(self, ctx: miru.ViewContext, button: miru.Button) -> None:
+        if not self.player.queue:
             await ctx.respond("No track is currently playing!", flags=hikari.MessageFlag.EPHEMERAL)
             return
         
-        await self.player.seek(0)
+        await self.player.set_position(0)
         await ctx.respond("Restarted current track!", flags=hikari.MessageFlag.EPHEMERAL)
 
-    @miru.button(emoji="⏯️", style=hikari.ButtonStyle.PRIMARY)
+    @miru.button(emoji="▶️", style=hikari.ButtonStyle.SUCCESS, row=0)
     async def play_pause_button(self, ctx: miru.ViewContext, button: miru.Button) -> None:
-        if not self.player.current:
+        if not self.player.queue:
             await ctx.respond("No track is currently playing!", flags=hikari.MessageFlag.EPHEMERAL)
             return
 
-        if self.player.paused:
-            await self.player.set_pause(False)
-            await ctx.respond("Resumed playback!", flags=hikari.MessageFlag.EPHEMERAL)
-        else:
-            await self.player.set_pause(True)
-            await ctx.respond("Paused playback!", flags=hikari.MessageFlag.EPHEMERAL)
+        await self.player.pause()  # Toggle pause state
+        self._update_play_pause_button()
+        
+        status = "Resumed" if not self.player.is_paused else "Paused"
+        await ctx.edit_response(components=self)  # Update button appearance
 
-    @miru.button(emoji="⏭️", style=hikari.ButtonStyle.PRIMARY)
+    @miru.button(emoji="⏭️", style=hikari.ButtonStyle.SECONDARY, row=0)
     async def skip_button(self, ctx: miru.ViewContext, button: miru.Button) -> None:
-        if not self.player.current:
+        if not self.player.queue:
             await ctx.respond("No track is currently playing!", flags=hikari.MessageFlag.EPHEMERAL)
             return
 
         await self.player.skip()
         await ctx.respond("Skipped track!", flags=hikari.MessageFlag.EPHEMERAL)
 
-    @miru.button(emoji="🔄", style=hikari.ButtonStyle.SUCCESS)
+    @miru.button(emoji="🔁", style=hikari.ButtonStyle.SECONDARY, row=1)
     async def loop_button(self, ctx: miru.ViewContext, button: miru.Button) -> None:
-        if not self.player.current:
+        if not self.player.queue:
             await ctx.respond("No track is currently playing!", flags=hikari.MessageFlag.EPHEMERAL)
             return
 
-        self.player.repeat = not self.player.repeat
-        status = "enabled" if self.player.repeat else "disabled"
-        await ctx.respond(f"Loop {status}!", flags=hikari.MessageFlag.EPHEMERAL)
+        new_state = self.player.set_loop()  # Toggles loop state
+        button.style = hikari.ButtonStyle.SUCCESS if new_state else hikari.ButtonStyle.SECONDARY
+        status = "enabled" if new_state else "disabled"
+        await ctx.edit_response(components=self)  # Update button appearance
 
-    @miru.button(emoji="⏹️", style=hikari.ButtonStyle.DANGER)
+    @miru.button(emoji="♾️", style=hikari.ButtonStyle.SECONDARY, row=1)
+    async def autoplay_button(self, ctx: miru.ViewContext, button: miru.Button) -> None:
+        if not self.player.queue:
+            await ctx.respond("No track is currently playing!", flags=hikari.MessageFlag.EPHEMERAL)
+            return
+
+        new_state = self.player.set_autoplay()
+        button.style = hikari.ButtonStyle.SUCCESS if new_state else hikari.ButtonStyle.SECONDARY
+        await ctx.edit_response(components=self)
+
+    @miru.button(emoji="⏹️", style=hikari.ButtonStyle.SECONDARY, row=1)
     async def stop_button(self, ctx: miru.ViewContext, button: miru.Button) -> None:
-        if not self.player.current:
+        if not self.player.queue:
             await ctx.respond("No track is currently playing!", flags=hikari.MessageFlag.EPHEMERAL)
             return
 
         await self.player.stop()
-        self.player.queue.clear()
-        await ctx.respond("Stopped playback and cleared queue!", flags=hikari.MessageFlag.EPHEMERAL)
+        # Reset play/pause button to play state
+        self.play_pause_button.emoji = "▶️"
+        self.play_pause_button.style = hikari.ButtonStyle.SUCCESS
+        await ctx.edit_response(components=self)  # Update button appearance
