@@ -26,6 +26,7 @@ go.work.sum
 
 # plugins
 plugins/
+!botman/plugins/
 
 # MACOs
 .DS_Store

@@ -31,7 +31,7 @@ bot.d.edited_messages = {}
 
 logger = logging.getLogger(__name__)
 # Load command modules
-bot.load_extensions_from("./commands")
+bot.load_extensions_from("./commands", recursive=True)
 
 
 
