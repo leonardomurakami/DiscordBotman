@@ -18,10 +18,10 @@ class AdminPlugin(BasePlugin):
         
     def _setup_commands(self) -> None:
         self.commands = [
-            KickCommand(self),
-            BanCommand(self),
-            PurgeCommand(self),
-            MuteCommand(self)
+            KickCommand(self.plugin),
+            BanCommand(self.plugin),
+            PurgeCommand(self.plugin),
+            MuteCommand(self.plugin)
         ]
 
 def load(bot: lightbulb.BotApp) -> None:

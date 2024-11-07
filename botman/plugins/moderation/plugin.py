@@ -18,10 +18,10 @@ class ModerationPlugin(BasePlugin):
         
     def _setup_commands(self) -> None:
         self.commands = [
-            SlowModeCommand(self),
-            WarnCommand(self),
-            WarningsCommand(self),
-            ClearWarningsCommand(self)
+            SlowModeCommand(self.plugin),
+            WarnCommand(self.plugin),
+            WarningsCommand(self.plugin),
+            ClearWarningsCommand(self.plugin)
         ]
 
 

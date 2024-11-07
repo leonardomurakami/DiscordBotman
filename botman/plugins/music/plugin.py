@@ -27,18 +27,18 @@ class MusicPlugin(BasePlugin):
         
     def _setup_commands(self) -> None:
         self.commands = [
-            JoinCommand(self),
-            PlayCommand(self),
-            QueueCommand(self),
-            VolumeCommand(self),
-            SkipCommand(self),
-            SeekCommand(self),
-            ClearCommand(self),
-            ShuffleCommand(self),
-            RemoveCommand(self),
-            AutoplayCommand(self),
-            StopCommand(self),
-            LeaveCommand(self)
+            JoinCommand(self.plugin),
+            PlayCommand(self.plugin),
+            QueueCommand(self.plugin),
+            VolumeCommand(self.plugin),
+            SkipCommand(self.plugin),
+            SeekCommand(self.plugin),
+            ClearCommand(self.plugin),
+            ShuffleCommand(self.plugin),
+            RemoveCommand(self.plugin),
+            AutoplayCommand(self.plugin),
+            StopCommand(self.plugin),
+            LeaveCommand(self.plugin)
         ]
 
 
