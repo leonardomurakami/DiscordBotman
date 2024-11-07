@@ -1,13 +1,13 @@
 import lightbulb
 
 from base.plugin import BasePlugin
-from .commands.userinfo import UserInfoCommand
-from .commands.serverinfo import ServerInfoCommand
-from .commands.poll import PollCommand
-from .commands.remind import RemindCommand
-from .commands.password import PasswordCommand
-from .commands.snipe import SnipeCommand
-from .commands.editsnipe import EditSnipeCommand
+from .commands._userinfo import UserInfoCommand
+from .commands._serverinfo import ServerInfoCommand
+from .commands._poll import PollCommand
+from .commands._remind import RemindCommand
+from .commands._password import PasswordCommand
+from .commands._snipe import SnipeCommand
+from .commands._editsnipe import EditSnipeCommand
 
 
 class UtilsPlugin(BasePlugin):

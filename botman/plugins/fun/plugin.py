@@ -1,11 +1,11 @@
 import lightbulb
 
 from base.plugin import BasePlugin
-from .commands.flip import FlipCommand
-from .commands.roll import RollCommand
-from .commands.eightball import Magic8BallCommand
-from .commands.rps import RPSCommand
-from .commands.wake import WakeCommand
+from .commands._flip import FlipCommand
+from .commands._roll import RollCommand
+from .commands._eightball import Magic8BallCommand
+from .commands._rps import RPSCommand
+from .commands._wake import WakeCommand
 
 class FunPlugin(BasePlugin):
     @property

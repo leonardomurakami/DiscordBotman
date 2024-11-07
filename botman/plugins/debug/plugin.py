@@ -1,10 +1,10 @@
 import lightbulb
 
 from base.plugin import BasePlugin
-from .commands.hello import HelloCommand
-from .commands.ping import PingCommand
-from .commands.sysinfo import SysInfoCommand
-from .commands.eval import EvalCommand
+from .commands._hello import HelloCommand
+from .commands._ping import PingCommand
+from .commands._sysinfo import SysInfoCommand
+from .commands._eval import EvalCommand
 
 
 class DebugPlugin(BasePlugin):

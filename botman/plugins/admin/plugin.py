@@ -1,10 +1,10 @@
 import lightbulb
 
 from base.plugin import BasePlugin
-from .commands.kick import KickCommand
-from .commands.ban import BanCommand
-from .commands.purge import PurgeCommand
-from .commands.mute import MuteCommand
+from .commands._kick import KickCommand
+from .commands._ban import BanCommand
+from .commands._purge import PurgeCommand
+from .commands._mute import MuteCommand
 
 
 class AdminPlugin(BasePlugin):

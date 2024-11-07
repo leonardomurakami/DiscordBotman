@@ -1,10 +1,10 @@
 import lightbulb
 
 from base.plugin import BasePlugin
-from .commands.slowmode import SlowModeCommand
-from .commands.warn import WarnCommand
-from .commands.warnings import WarningsCommand
-from .commands.clearwarnings import ClearWarningsCommand
+from .commands._slowmode import SlowModeCommand
+from .commands._warn import WarnCommand
+from .commands._warnings import WarningsCommand
+from .commands._clearwarnings import ClearWarningsCommand
 
 
 class ModerationPlugin(BasePlugin):

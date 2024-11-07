@@ -3,17 +3,17 @@ import lightbulb
 
 from base.plugin import BasePlugin
 from .commands.join import JoinCommand
-from .commands.play import PlayCommand
-from .commands.queue import QueueCommand
+from .commands._play import PlayCommand
+from .commands._queue import QueueCommand
 from .commands.volume import VolumeCommand
-from .commands.skip import SkipCommand
+from .commands._skip import SkipCommand
 from .commands.seek import SeekCommand
-from .commands.clear import ClearCommand
-from .commands.shuffle import ShuffleCommand
-from .commands.remove import RemoveCommand
-from .commands.autoplay import AutoplayCommand
-from .commands.stop import StopCommand
-from .commands.leave import LeaveCommand
+from .commands._clear import ClearCommand
+from .commands._shuffle import ShuffleCommand
+from .commands._remove import RemoveCommand
+from .commands._autoplay import AutoplayCommand
+from .commands._stop import StopCommand
+from .commands._leave import LeaveCommand
 
 
 class MusicPlugin(BasePlugin):
