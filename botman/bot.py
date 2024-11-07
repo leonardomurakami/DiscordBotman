@@ -1,169 +1,115 @@
-import os
-import miru
-import time
-import hikari
-import ongaku
 import logging
-import datetime
+import hikari
 import lightbulb
-import traceback
+import miru
+import ongaku
 
 from help import HelpCommand
-from handlers.session import RetrySessionHandler
-
-bot = lightbulb.BotApp(
-    token=os.getenv("DISCORD_BOT_TOKEN", ""),
-    prefix="!",
-    help_class=HelpCommand,
-    intents=hikari.Intents.ALL,
-    owner_ids=[int(os.getenv("DISCORD_BOT_OWNER_ID", "0"))]
-)
-bot.d.miru = miru.Client(bot)
-bot.d.ongaku = ongaku.Client(bot, session_handler=RetrySessionHandler)
-bot.d.ongaku.create_session(
-    name="default-session",
-    host=os.getenv("LAVALINK_SERVER_HOST", "lavalink"),
-    port=int(os.getenv("LAVALINK_SERVER_PORT", 2333)),
-    password=os.getenv("LAVALINK_SERVER_PASSWORD", "youshallnotpass"),
-)
-bot.d.deleted_messages = {}
-bot.d.edited_messages = {}
+from config import BotConfig, LavalinkConfig, LogConfig
+from handlers.session_handler import RetrySessionHandler
+from handlers.error_handler import ErrorHandler
+from handlers.message_handler import MessageHandler
 
 logger = logging.getLogger(__name__)
-# Load command modules
-bot.load_extensions_from("./commands")
 
 
-
-@bot.listen(hikari.StartedEvent)
-async def on_started(event):
-    logger.info("Bot has started!")
-        
-@bot.listen(lightbulb.CommandErrorEvent)
-async def on_error(event: lightbulb.CommandErrorEvent) -> None:
-    if isinstance(event.exception, lightbulb.CommandNotFound):
-        # Handle command not found
-        command = str(event.exception).split("'")[1]
-        embed = hikari.Embed(
-            title="❌ Command Not Found",
-            description=f"""The command `{command}` doesn't exist!""",
-            color=hikari.Color(0xff0000)
-        )
-        embed.add_field(
-            name="Need Help?",
-            value="Use `!help` to see a list of all available commands.",
-            inline=False
-        )
-        logger.error(f"User {event.context.author.username} in guild {event.context.guild_id} ran unknown command: {command}")
-        await event.context.respond(embed=embed)
-        return
-
-    if isinstance(event.exception, lightbulb.MissingRequiredPermission):
-        # Handle missing permissions
-        embed = hikari.Embed(
-            title="❌ Missing Permissions",
-            description="You don't have the required permissions to use this command!",
-            color=hikari.Color(0xff0000)
-        )
-        await event.context.respond(embed=embed)
-        return
-
-    if isinstance(event.exception, lightbulb.NotOwner):
-        # Handle non-owner using owner-only commands
-        embed = hikari.Embed(
-            title="❌ Owner Only",
-            description="This command can only be used by the bot owner!",
-            color=hikari.Color(0xff0000)
-        )
-        await event.context.respond(embed=embed)
-        return
-
-    if isinstance(event.exception, lightbulb.CommandIsOnCooldown):
-        # Handle cooldown
-        embed = hikari.Embed(
-            title="⏳ Cooldown",
-            description=f"This command is on cooldown! Try again in {event.exception.retry_after:.2f} seconds.",
-            color=hikari.Color(0xff9900)
-        )
-        await event.context.respond(embed=embed)
-        return
-
-    if isinstance(event.exception, lightbulb.NotEnoughArguments):
-        # Handle missing arguments
-        embed = hikari.Embed(
-            title="❌ Missing Argument",
-            description=f"Missing required argument: `{' '.join(options.name for options in event.exception.missing_options)}`",
-            color=hikari.Color(0xff0000)
-        )
-        embed.add_field(
-            name="Usage",
-            value=f"`{event.context.prefix}{event.context.command.signature}`",
-            inline=False
-        )
-        await event.context.respond(embed=embed)
-        return
-
-    if isinstance(event.exception, lightbulb.CommandInvocationError):
-        # Handle general command errors
-        embed = hikari.Embed(
-            title="❌ Command Error",
-            description="An error occurred while executing the command!",
-            color=hikari.Color(0xff0000)
-        )
-        
-        # Add error details if you want to show them
-        error_details = ''.join(traceback.format_exception(
-            type(event.exception.__cause__),
-            event.exception.__cause__,
-            event.exception.__cause__.__traceback__
-        ))
-        
-        # Optionally add a simplified error message to the embed
-        embed.add_field(
-            name="Error Details",
-            value=f"```{str(event.exception.__cause__)}```",
-            inline=False
-        )
-        
-        await event.context.respond(embed=embed)
-        return
-
-    # Handle any other unexpected errors
-    embed = hikari.Embed(
-        title="❌ Unexpected Error",
-        description="An unexpected error occurred! Please try again later.",
-        color=hikari.Color(0xff0000)
-    )
+class Bot(lightbulb.BotApp):
+    """Main bot class with all core functionality."""
     
-    await event.context.respond(embed=embed)
-
-@bot.listen(hikari.GuildMessageDeleteEvent)
-async def on_message_delete(event: hikari.GuildMessageDeleteEvent) -> None:
-    if not event.old_message:
-        return
+    def __init__(self):
+        # Load configurations
+        self.config = BotConfig()
+        self.lavalink_config = LavalinkConfig()
+        self.log_config = LogConfig()
         
-    if event.old_message.author.is_bot:
-        return
-    bot.d.deleted_messages[event.channel_id] = {
-        'content': event.old_message.content,
-        'author': event.old_message.author,
-        'time': datetime.datetime.now(),
-        'attachments': event.old_message.attachments
-    }
-
-@bot.listen(hikari.GuildMessageUpdateEvent)
-async def on_message_edit(event: hikari.GuildMessageUpdateEvent) -> None:
-    if not event.old_message:
-        return
+        # Initialize the bot
+        super().__init__(
+            token=self.config.token,
+            prefix=self.config.prefix,
+            help_class=HelpCommand,
+            intents=hikari.Intents.ALL,
+            owner_ids=self.config.owner_ids
+        )
         
-    if event.old_message.author.is_bot:
-        return
-    
-    bot.d.edited_messages[event.channel_id] = {
-        'old_content': event.old_message.content,
-        'new_content': event.message.content,
-        'author': event.old_message.author,
-        'time': datetime.datetime.now()
-    }
+        # Initialize storage
+        self.d.deleted_messages = {}
+        self.d.edited_messages = {}
+        
+        # Initialize handlers
+        self.message_handler = MessageHandler(self)
+        self.error_handler = ErrorHandler()
+        
+        # Setup components
+        self._setup_logging()
+        self._setup_integrations()
+        self._load_extensions()
+        self._register_events()
 
-bot.run()
+    def _setup_logging(self) -> None:
+        """Configure logging settings."""
+        logging.basicConfig(
+            level=getattr(logging, self.log_config.level),
+            format=self.log_config.format,
+            handlers=[
+                logging.StreamHandler(),
+                logging.FileHandler(self.log_config.file_path)
+            ]
+        )
+        logger.info("Logging system initialized")
+
+    def _setup_integrations(self) -> None:
+        """Initialize third-party integrations."""
+        # Setup Miru for components
+        self.d.miru = miru.Client(self)
+        
+        # Setup Ongaku for music
+        self.d.ongaku = ongaku.Client(self, session_handler=RetrySessionHandler)
+        self.d.ongaku.create_session(
+            name="default-session",
+            host=self.lavalink_config.host,
+            port=self.lavalink_config.port,
+            password=self.lavalink_config.password,
+        )
+        logger.info("Third-party integrations initialized")
+
+    def _load_extensions(self) -> None:
+        """Load all command extensions."""
+        try:
+            self.load_extensions_from("./commands", recursive=True)
+            logger.info("Command extensions loaded successfully")
+        except Exception as e:
+            logger.error(f"Failed to load extensions: {e}")
+            raise
+
+    def _register_events(self) -> None:
+        """Register event handlers."""
+        self.listen(hikari.StartedEvent)(self.on_started)
+        self.listen(lightbulb.CommandErrorEvent)(self.on_error)
+        self.listen(hikari.GuildMessageDeleteEvent)(self.message_handler.on_message_delete)
+        self.listen(hikari.GuildMessageUpdateEvent)(self.message_handler.on_message_edit)
+        logger.info("Event handlers registered")
+
+    async def on_started(self, event: hikari.StartedEvent) -> None:
+        """Handler for bot startup."""
+        logger.info("Bot has started successfully!")
+
+    async def on_error(self, event: lightbulb.CommandErrorEvent) -> None:
+        """Central error handler that delegates to specific handlers."""
+        try:
+            if isinstance(event.exception, lightbulb.CommandNotFound):
+                await self.error_handler.handle_command_not_found(event)
+            elif isinstance(event.exception, lightbulb.MissingRequiredPermission):
+                await self.error_handler.handle_missing_permissions(event)
+            elif isinstance(event.exception, lightbulb.NotOwner):
+                await self.error_handler.handle_not_owner(event)
+            elif isinstance(event.exception, lightbulb.CommandIsOnCooldown):
+                await self.error_handler.handle_cooldown(event)
+            elif isinstance(event.exception, lightbulb.NotEnoughArguments):
+                await self.error_handler.handle_missing_arguments(event)
+            elif isinstance(event.exception, lightbulb.CommandInvocationError):
+                await self.error_handler.handle_command_invocation_error(event)
+            else:
+                await self.error_handler.handle_unexpected_error(event)
+        except Exception as e:
+            logger.error(f"Error in error handler: {e}")
+            await event.context.respond("An error occurred while handling another error!")

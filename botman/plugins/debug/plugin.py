@@ -1,0 +1,35 @@
+import lightbulb
+
+from base.plugin import BasePlugin
+from .commands.hello import HelloCommand
+from .commands.ping import PingCommand
+from .commands.sysinfo import SysInfoCommand
+from .commands.eval import EvalCommand
+
+
+class DebugPlugin(BasePlugin):
+    @property
+    def plugin_name(self) -> str:
+        return "debug"
+        
+    @property
+    def plugin_description(self) -> str:
+        return "Debug and system information commands"
+        
+    def _setup_commands(self) -> None:
+        self.commands = [
+            HelloCommand(self.bot),
+            PingCommand(self.bot),
+            SysInfoCommand(self.bot),
+            EvalCommand(self.bot)
+        ]
+
+
+def load(bot: lightbulb.BotApp) -> None:
+    plugin = DebugPlugin(bot)
+    plugin.load()
+
+
+def unload(bot: lightbulb.BotApp) -> None:
+    plugin = DebugPlugin(bot)
+    plugin.unload()
