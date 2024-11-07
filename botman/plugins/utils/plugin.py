@@ -21,13 +21,13 @@ class UtilsPlugin(BasePlugin):
         
     def _setup_commands(self) -> None:
         self.commands = [
-            UserInfoCommand(self.bot),
-            ServerInfoCommand(self.bot),
-            PollCommand(self.bot),
-            RemindCommand(self.bot),
-            PasswordCommand(self.bot),
-            SnipeCommand(self.bot),
-            EditSnipeCommand(self.bot)
+            UserInfoCommand(self),
+            ServerInfoCommand(self),
+            PollCommand(self),
+            RemindCommand(self),
+            PasswordCommand(self),
+            SnipeCommand(self),
+            EditSnipeCommand(self)
         ]
 
 def load(bot: lightbulb.BotApp) -> None:

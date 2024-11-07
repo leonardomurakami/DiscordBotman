@@ -12,7 +12,7 @@ class PingCommand(BaseCommand):
         self.help_text = "!ping or /ping - Shows the bot's latency to Discord's servers"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.command(self.name, self.description)
         @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)

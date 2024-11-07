@@ -12,7 +12,7 @@ class RPSCommand(BaseCommand):
         self.help_text = "!rps or /rps - Play Rock, Paper, Scissors using buttons"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.command(self.name, self.description)
         @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)

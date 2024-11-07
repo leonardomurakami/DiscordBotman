@@ -11,7 +11,7 @@ class UserInfoCommand(BaseCommand):
         self.help_text = "!userinfo <user> or /userinfo <user> - Shows detailed information about a user"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.option("user", "The user to get information about", type=hikari.User, required=False)
         @lightbulb.command(self.name, self.description)

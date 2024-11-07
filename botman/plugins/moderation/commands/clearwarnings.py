@@ -11,7 +11,7 @@ class ClearWarningsCommand(BaseCommand):
         self.help_text = "!clearwarnings <user> or /clearwarnings - Clear all warnings for a user"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.MODERATE_MEMBERS))
         @lightbulb.option("user", "The user to clear warnings for", type=hikari.User, required=True)

@@ -11,7 +11,7 @@ class SeekCommand(BaseCommand):
         self.help_text = "!seek <seconds> or /seek <seconds> - Seek to a position in the current track"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.add_checks(lightbulb.guild_only)
         @lightbulb.option("seconds", "Number of seconds to seek", type=int, required=True)
         @lightbulb.command(self.name, self.description)

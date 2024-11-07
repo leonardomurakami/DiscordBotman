@@ -13,7 +13,7 @@ class StopCommand(BaseCommand):
         self.help_text = "!stop or /stop - Stop playing and clear the queue"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.add_checks(lightbulb.guild_only)
         @lightbulb.command(self.name, self.description)
         @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)

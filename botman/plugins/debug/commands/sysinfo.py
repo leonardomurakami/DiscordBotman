@@ -13,7 +13,7 @@ class SysInfoCommand(BaseCommand):
         self.help_text = "!sysinfo or /sysinfo - Displays system information including CPU, RAM, and Python version"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.command(self.name, self.description)
         @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)

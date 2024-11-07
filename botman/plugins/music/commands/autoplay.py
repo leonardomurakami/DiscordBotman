@@ -11,7 +11,7 @@ class AutoplayCommand(BaseCommand):
         self.help_text = "!autoplay or /autoplay - Toggle autoplay"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.add_checks(lightbulb.guild_only)
         @lightbulb.option("state", "Enable or disable autoplay", type=bool, required=False)
         @lightbulb.command(self.name, self.description)

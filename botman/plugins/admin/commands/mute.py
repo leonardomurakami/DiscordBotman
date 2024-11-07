@@ -12,7 +12,7 @@ class MuteCommand(BaseCommand):
         self.help_text = "!mute <user> <duration> <reason> or /mute <user> <duration> <reason> - Timeout a user"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.MODERATE_MEMBERS))
         @lightbulb.option("reason", "Reason for the mute", type=str, required=False, default="No reason provided")

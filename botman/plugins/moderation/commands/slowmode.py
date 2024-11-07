@@ -11,7 +11,7 @@ class SlowModeCommand(BaseCommand):
         self.help_text = "!slowmode <duration> or /slowmode - Set channel slowmode (0 to disable)"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.MANAGE_CHANNELS))
         @lightbulb.option("duration", "Slowmode duration in seconds (0 to disable)", type=int, required=True)

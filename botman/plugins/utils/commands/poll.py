@@ -11,7 +11,7 @@ class PollCommand(BaseCommand):
         self.help_text = "!poll <question> | <option1> | <option2> ... or /poll - Create an interactive poll with up to 5 options"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.option("options", "Options separated by |", type=str, required=True, modifier=lightbulb.OptionModifier.CONSUME_REST)
         @lightbulb.option("question", "Question to be polled", type=str, required=True)

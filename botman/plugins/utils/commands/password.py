@@ -13,7 +13,7 @@ class PasswordCommand(BaseCommand):
         self.help_text = "!password <length> or /password - Generate a secure random password"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.option("length", "Password length", type=int, required=False, default=16)
         @lightbulb.command(self.name, self.description)

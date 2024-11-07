@@ -18,10 +18,10 @@ class DebugPlugin(BasePlugin):
         
     def _setup_commands(self) -> None:
         self.commands = [
-            HelloCommand(self.bot),
-            PingCommand(self.bot),
-            SysInfoCommand(self.bot),
-            EvalCommand(self.bot)
+            HelloCommand(self),
+            PingCommand(self),
+            SysInfoCommand(self),
+            EvalCommand(self)
         ]
 
 

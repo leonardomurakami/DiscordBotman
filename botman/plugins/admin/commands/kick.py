@@ -11,7 +11,7 @@ class KickCommand(BaseCommand):
         self.help_text = "!kick <user> <reason> or /kick <user> <reason> - Kicks a user from the server"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.KICK_MEMBERS))
         @lightbulb.option("reason", "Reason for the kick", type=str, required=False, default="No reason provided")

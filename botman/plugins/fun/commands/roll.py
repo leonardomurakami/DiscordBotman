@@ -12,7 +12,7 @@ class RollCommand(BaseCommand):
         self.help_text = "!roll <sides> or /roll <sides> - Rolls a dice with specified number of sides"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.option("sides", "Number of sides on the dice", type=int, default=6)
         @lightbulb.command(self.name, self.description)

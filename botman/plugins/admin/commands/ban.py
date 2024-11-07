@@ -11,7 +11,7 @@ class BanCommand(BaseCommand):
         self.help_text = "!ban <user> <reason> or /ban <user> <reason> - Bans a user from the server"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.BAN_MEMBERS))
         @lightbulb.option("reason", "Reason for the ban", type=str, required=False, default="No reason provided")

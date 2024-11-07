@@ -12,7 +12,7 @@ class RemindCommand(BaseCommand):
         self.help_text = "!remind <time> <reminder> or /remind - Set a reminder (time in minutes)"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.option("reminder", "What to remind you about", type=str, required=True)
         @lightbulb.option("time", "Time in minutes", type=int, required=True)

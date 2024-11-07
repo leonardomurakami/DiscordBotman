@@ -15,7 +15,7 @@ class PlayCommand(BaseCommand):
         self.help_text = "!play <query> or /play <query> - Play a song or playlist"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.add_checks(lightbulb.guild_only)
         @lightbulb.option("query", "The song/playlist to play", type=str, required=True, modifier=lightbulb.OptionModifier.CONSUME_REST)
         @lightbulb.command(self.name, self.description)

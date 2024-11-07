@@ -13,7 +13,7 @@ class WakeCommand(BaseCommand):
         self.help_text = "!wake <user> or /wake <user> - Moves a user between voice channels briefly to get their attention"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.option("times", "Number of moves (default: 5, max: 10)", type=int, required=False, default=5)
         @lightbulb.option("user", "The user to wake up", type=hikari.Member, required=True)

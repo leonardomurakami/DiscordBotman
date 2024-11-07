@@ -12,7 +12,7 @@ class Magic8BallCommand(BaseCommand):
         self.help_text = "!8ball <question> or /8ball <question> - Ask the magic 8-ball a question"
         
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.option("question", "The question to ask", type=str, required=True)
         @lightbulb.command(self.name, self.description)

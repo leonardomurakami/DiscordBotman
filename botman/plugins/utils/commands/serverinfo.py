@@ -11,7 +11,7 @@ class ServerInfoCommand(BaseCommand):
         self.help_text = "!serverinfo or /serverinfo - Shows detailed information about the server"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.command(self.name, self.description)
         @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)

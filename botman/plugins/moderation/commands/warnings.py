@@ -11,7 +11,7 @@ class WarningsCommand(BaseCommand):
         self.help_text = "!warnings <user> or /warnings - Check a user's warnings"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.MODERATE_MEMBERS))
         @lightbulb.option("user", "The user to check", type=hikari.User, required=True)

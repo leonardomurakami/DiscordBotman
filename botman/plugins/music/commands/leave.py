@@ -12,7 +12,7 @@ class LeaveCommand(BaseCommand):
         self.help_text = "!leave or /leave - Leave the voice channel"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.add_checks(lightbulb.guild_only)
         @lightbulb.command(self.name, self.description)
         @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)

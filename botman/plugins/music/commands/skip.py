@@ -11,7 +11,7 @@ class SkipCommand(BaseCommand):
         self.help_text = "!skip or /skip - Skip the current track"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.add_checks(lightbulb.guild_only)
         @lightbulb.command(self.name, self.description)
         @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)

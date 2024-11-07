@@ -11,7 +11,7 @@ class HelloCommand(BaseCommand):
         self.help_text = "!hello or /hello - Simple greeting command to test if the bot is responsive"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.command(self.name, self.description)
         @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)

@@ -18,11 +18,11 @@ class FunPlugin(BasePlugin):
         
     def _setup_commands(self) -> None:
         self.commands = [
-            FlipCommand(self.bot),
-            RollCommand(self.bot),
-            Magic8BallCommand(self.bot),
-            RPSCommand(self.bot),
-            WakeCommand(self.bot)
+            FlipCommand(self),
+            RollCommand(self),
+            Magic8BallCommand(self),
+            RPSCommand(self),
+            WakeCommand(self)
         ]
 
 def load(bot: lightbulb.BotApp) -> None:

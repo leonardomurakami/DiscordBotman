@@ -11,7 +11,7 @@ class RemoveCommand(BaseCommand):
         self.help_text = "!remove <position> or /remove <position> - Remove a track from the queue"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.add_checks(lightbulb.guild_only)
         @lightbulb.option("position", "Queue position to remove", type=int, required=True)
         @lightbulb.command(self.name, self.description)

@@ -10,7 +10,7 @@ class VolumeCommand(BaseCommand):
         self.help_text = "!volume <volume> or /volume <volume> - Set the playback volume"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.add_checks(lightbulb.guild_only)
         @lightbulb.option("volume", "Volume level (0-150)", type=int, min_value=0, max_value=150, required=True)
         @lightbulb.command(self.name, self.description)

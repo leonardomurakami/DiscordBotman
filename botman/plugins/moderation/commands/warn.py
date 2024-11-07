@@ -12,7 +12,7 @@ class WarnCommand(BaseCommand):
         self.help_text = "!warn <user> <reason> or /warn - Warn a user"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.MODERATE_MEMBERS))
         @lightbulb.option("reason", "Reason for the warning", type=str, required=True)

@@ -7,7 +7,7 @@ class BasePlugin(ABC):
     """Base class for all plugins"""
     
     def __init__(self, bot: lightbulb.BotApp):
-        self.bot = bot
+        self = bot
         self.plugin = lightbulb.Plugin(self.plugin_name)
         self.plugin.description = self.plugin_description
         self.commands: typing.List[BaseCommand] = []
@@ -38,8 +38,8 @@ class BasePlugin(ABC):
             
     def load(self) -> None:
         """Load plugin into bot"""
-        self.bot.add_plugin(self.plugin)
+        self.add_plugin(self.plugin)
         
     def unload(self) -> None:
         """Unload plugin from bot"""
-        self.bot.remove_plugin(self.plugin)
+        self.remove_plugin(self.plugin)

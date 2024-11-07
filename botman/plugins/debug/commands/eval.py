@@ -12,7 +12,7 @@ class EvalCommand(BaseCommand):
         self.help_text = "!eval <code> or /eval <code> - Evaluates Python code (Owner only for security)"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.add_checks(lightbulb.owner_only)
         @lightbulb.set_help(self.help_text)
         @lightbulb.option("code", "The Python code to evaluate", type=str, required=True)

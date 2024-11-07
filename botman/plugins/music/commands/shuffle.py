@@ -11,7 +11,7 @@ class ShuffleCommand(BaseCommand):
         self.help_text = "!shuffle or /shuffle - Shuffle the queue"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.add_checks(lightbulb.guild_only)
         @lightbulb.command(self.name, self.description)
         @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)

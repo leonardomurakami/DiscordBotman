@@ -75,7 +75,7 @@ class Bot(lightbulb.BotApp):
     def _load_extensions(self) -> None:
         """Load all command extensions."""
         try:
-            self.load_extensions_from("./commands", recursive=True)
+            self.load_extensions_from("./plugins", recursive=True)
             logger.info("Command extensions loaded successfully")
         except Exception as e:
             logger.error(f"Failed to load extensions: {e}")

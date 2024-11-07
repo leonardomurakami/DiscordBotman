@@ -4,8 +4,8 @@ import lightbulb
 class BaseCommand(ABC):
     """Base class for all bot commands"""
     
-    def __init__(self, bot: lightbulb.BotApp):
-        self.bot = bot
+    def __init__(self, plugin: lightbulb.Plugin):
+        self.plugin = plugin
         self.name: str = ""
         self.description: str = ""
         self.help_text: str = ""
@@ -23,7 +23,7 @@ class BaseCommand(ABC):
         
     def create_command(self) -> lightbulb.Command:
         """Create and return the lightbulb command"""
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.command(self.name, self.description)
         @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)

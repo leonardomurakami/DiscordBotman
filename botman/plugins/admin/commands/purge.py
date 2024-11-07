@@ -12,7 +12,7 @@ class PurgeCommand(BaseCommand):
         self.help_text = "!purge <amount> or /purge <amount> - Deletes specified number of messages"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.MANAGE_MESSAGES))
         @lightbulb.option("amount", "Number of messages to delete", type=int, required=True)

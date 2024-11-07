@@ -13,7 +13,7 @@ class SnipeCommand(BaseCommand):
         self.help_text = "!snipe or /snipe - Shows the last deleted message in the channel"
 
     def create_command(self) -> lightbulb.Command:
-        @self.bot.command
+        @self.plugin.command
         @lightbulb.set_help(self.help_text)
         @lightbulb.command(self.name, self.description)
         @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
