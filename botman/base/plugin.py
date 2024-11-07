@@ -38,8 +38,8 @@ class BasePlugin(ABC):
             
     def load(self) -> None:
         """Load plugin into bot"""
-        self.add_plugin(self.plugin)
+        self.bot.add_plugin(self.plugin)
         
     def unload(self) -> None:
         """Unload plugin from bot"""
-        self.remove_plugin(self.plugin)
+        self.bot.remove_plugin(self.plugin)
