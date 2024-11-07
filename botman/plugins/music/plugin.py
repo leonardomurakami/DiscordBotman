@@ -2,12 +2,12 @@ import os
 import lightbulb
 
 from base.plugin import BasePlugin
-from .commands.join import JoinCommand
+from .commands._join import JoinCommand
 from .commands._play import PlayCommand
 from .commands._queue import QueueCommand
-from .commands.volume import VolumeCommand
+from .commands._volume import VolumeCommand
 from .commands._skip import SkipCommand
-from .commands.seek import SeekCommand
+from .commands._seek import SeekCommand
 from .commands._clear import ClearCommand
 from .commands._shuffle import ShuffleCommand
 from .commands._remove import RemoveCommand
