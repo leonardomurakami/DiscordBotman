@@ -29,9 +29,9 @@ class HelpCommand(lightbulb.BaseHelpCommand):
         embeds.append(overview)
         labels.append("Overview")
 
-        # Create an embed for each plugin
+        logger.info(f"All plugins: {context.bot.plugins}\nValues: {context.bot.plugins.values()}")
+
         for plugin in context.bot.plugins.values():
-            # Skip if plugin has no commands or is hidden
             if not plugin.all_commands:
                 continue
                 
