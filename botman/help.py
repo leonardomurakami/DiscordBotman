@@ -29,9 +29,9 @@ class HelpCommand(lightbulb.BaseHelpCommand):
         embeds.append(overview)
         labels.append("Overview")
 
-        logger.info(f"All plugins: {context.bot.plugins}\nValues: {context.bot.plugins.values()}")
 
         for plugin in context.bot.plugins.values():
+            logger.info(f"All commands: {plugin.all_commands}")  # Debug log
             if not plugin.all_commands:
                 continue
                 
