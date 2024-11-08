@@ -48,7 +48,7 @@ class Bot(lightbulb.BotApp):
         if not message.guild_id:
             return "!"
         
-        return await self.api_client.get_guild_prefix(str(message.guild_id))
+        return await self.d.api_client.get_guild_prefix(str(message.guild_id))
 
     def _setup_logging(self) -> None:
         """Configure logging settings."""
