@@ -4,6 +4,7 @@ import lightbulb
 import miru
 import ongaku
 
+from help import HelpCommand
 from config import BotConfig, LavalinkConfig, LogConfig
 from handlers.session_handler import RetrySessionHandler
 from handlers.error_handler import ErrorHandler
@@ -25,7 +26,7 @@ class Bot(lightbulb.BotApp):
         super().__init__(
             token=self.config.token,
             prefix=self.config.prefix,
-            help_class=None,
+            help_class=HelpCommand,
             intents=hikari.Intents.ALL,
             owner_ids=self.config.owner_ids
         )
