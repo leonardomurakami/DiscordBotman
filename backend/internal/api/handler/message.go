@@ -33,7 +33,7 @@ func (h *Handler) GetRecentDeletedMessages(c *gin.Context) {
 		Find(&messages)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error.Error()})
 		return
 	}
 
@@ -66,7 +66,7 @@ func (h *Handler) GetRecentEditedMessages(c *gin.Context) {
 		Find(&messages)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error.Error()})
 		return
 	}
 
