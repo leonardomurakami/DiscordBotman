@@ -3,6 +3,7 @@ import hikari
 import lightbulb
 import miru
 import ongaku
+import os
 
 from help import HelpCommand
 from config import BotConfig, LavalinkConfig, LogConfig
