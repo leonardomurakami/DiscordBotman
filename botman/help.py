@@ -31,8 +31,11 @@ class HelpCommand(lightbulb.BaseHelpCommand):
 
         # Create an embed for each plugin
         for plugin in context.bot.plugins.values():
+            # Skip if plugin has no commands or is hidden
             if not plugin.all_commands:
                 continue
+                
+            logger.info(f"Processing plugin: {plugin.name}")  # Debug log
 
             embed = hikari.Embed(
                 title=f"{plugin.name} Plugin",
@@ -41,13 +44,13 @@ class HelpCommand(lightbulb.BaseHelpCommand):
             )
 
             # Filter out non-slash commands
-            commands = [cmd for cmd in plugin.all_commands if not isinstance(cmd, lightbulb.commands.prefix.PrefixCommand)]
+            commands = [cmd for cmd in plugin.all_commands 
+                    if lightbulb.SlashCommand in cmd.implements]
+            
             if commands:
                 command_list = []
                 for cmd in commands:
-                    # Get command help text if available
-                    help_text = cmd.get_help(context) if hasattr(cmd, 'get_help') else cmd.description
-                    
+                    help_text = getattr(cmd, 'help_text', cmd.description)
                     command_list.append(
                         f"**{cmd.name}**\n"
                         f"└ {help_text}\n"
@@ -63,11 +66,14 @@ class HelpCommand(lightbulb.BaseHelpCommand):
                 embeds.append(embed)
                 labels.append(plugin.name)
 
-        # Send embeds with navigation
-        view = HelpView(embeds, labels, timeout=300.0)
-        response = await context.respond(embed=embeds[0], components=view.build())
-        message = await response.message()
-        context.app.d.miru.start_view(view)
+        if len(embeds) > 1:  # Only create view if we have plugins to show
+            view = HelpView(embeds, labels, timeout=300.0)
+            response = await context.respond(embed=embeds[0], components=view.build())
+            message = await response.message()
+            view.start(message)  # Start the view with the message
+        else:
+            # If no plugins found, just show the overview
+            await context.respond(embed=embeds[0])
 
     async def send_plugin_help(self, context: lightbulb.Context, plugin: lightbulb.Plugin) -> None:
         embed = hikari.Embed(
