@@ -24,9 +24,6 @@ class Bot(lightbulb.BotApp):
         self.lavalink_config = LavalinkConfig()
         self.log_config = LogConfig()
 
-        # Initialize the API Client
-        self.api_client = APIClient(os.getenv("BOT_API_URL", "http://localhost:8080"))
-        
         # Initialize the bot
         super().__init__(
             token=self.config.token,
@@ -35,10 +32,6 @@ class Bot(lightbulb.BotApp):
             intents=hikari.Intents.ALL,
             owner_ids=self.config.owner_ids
         )
-        
-        # Initialize storage
-        self.d.deleted_messages = {}
-        self.d.edited_messages = {}
         
         # Initialize handlers
         self.message_handler = MessageHandler(self)
@@ -82,6 +75,9 @@ class Bot(lightbulb.BotApp):
             port=self.lavalink_config.port,
             password=self.lavalink_config.password,
         )
+
+        self.d.api_client = APIClient(os.getenv("BOT_API_URL", "http://localhost:8080"))
+    
         logger.info("Third-party integrations initialized")
 
     def _load_extensions(self) -> None:
