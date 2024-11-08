@@ -6,6 +6,7 @@ import ongaku
 
 from help import HelpCommand
 from config import BotConfig, LavalinkConfig, LogConfig
+from api.api_client import APIClient
 from handlers.session_handler import RetrySessionHandler
 from handlers.error_handler import ErrorHandler
 from handlers.message_handler import MessageHandler
@@ -21,11 +22,14 @@ class Bot(lightbulb.BotApp):
         self.config = BotConfig()
         self.lavalink_config = LavalinkConfig()
         self.log_config = LogConfig()
+
+        # Initialize the API Client
+        self.api_client = APIClient(os.getenv("BOT_API_URL", "http://localhost:8080"))
         
         # Initialize the bot
         super().__init__(
             token=self.config.token,
-            prefix=self.config.prefix,
+            prefix=self._get_prefix,
             help_class=HelpCommand,
             intents=hikari.Intents.ALL,
             owner_ids=self.config.owner_ids
@@ -44,6 +48,13 @@ class Bot(lightbulb.BotApp):
         self._setup_integrations()
         self._load_extensions()
         self._register_events()
+
+    async def _get_prefix(self, bot, message: hikari.Message) -> str:
+        """Get the prefix for the guild."""
+        if not message.guild_id:
+            return "!"
+        
+        return await self.api_client.get_guild_prefix(str(message.guild_id))
 
     def _setup_logging(self) -> None:
         """Configure logging settings."""

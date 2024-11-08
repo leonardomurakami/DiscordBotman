@@ -8,6 +8,7 @@ from .commands._remind import RemindCommand
 from .commands._password import PasswordCommand
 from .commands._snipe import SnipeCommand
 from .commands._editsnipe import EditSnipeCommand
+from .commands._prefix import PrefixCommand
 
 
 class UtilsPlugin(BasePlugin):
@@ -27,7 +28,8 @@ class UtilsPlugin(BasePlugin):
             RemindCommand(self.plugin),
             PasswordCommand(self.plugin),
             SnipeCommand(self.plugin),
-            EditSnipeCommand(self.plugin)
+            EditSnipeCommand(self.plugin),
+            PrefixCommand(self.plugin),
         ]
 
 def load(bot: lightbulb.BotApp) -> None:

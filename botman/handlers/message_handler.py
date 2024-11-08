@@ -11,35 +11,32 @@ class MessageHandler:
         self.bot = bot
 
     async def on_message_delete(self, event: hikari.GuildMessageDeleteEvent) -> None:
-        """Handle message deletion events."""
-        if not event.old_message or event.old_message.author.is_bot:
+        """Handle message delete events."""
+        if not event.old_message:
             return
             
-        self.bot.d.deleted_messages[event.channel_id] = {
-            'content': event.old_message.content,
-            'author': event.old_message.author,
-            'time': datetime.datetime.now(),
-            'attachments': event.old_message.attachments
+        message_data = {
+            "guild_id": str(event.guild_id),
+            "channel_id": str(event.channel_id),
+            "message_id": str(event.message_id),
+            "content": event.old_message.content,
+            "author_id": str(event.old_message.author.id) if event.old_message.author else None
         }
         
-        logger.debug(
-            f"Message deleted in channel {event.channel_id} "
-            f"by user {event.old_message.author.username}"
-        )
+        await self.bot.d.api_client.store_deleted_message(message_data)
 
     async def on_message_edit(self, event: hikari.GuildMessageUpdateEvent) -> None:
         """Handle message edit events."""
-        if not event.old_message or event.old_message.author.is_bot:
+        if not event.old_message or not event.message:
             return
-        
-        self.bot.d.edited_messages[event.channel_id] = {
-            'old_content': event.old_message.content,
-            'new_content': event.message.content,
-            'author': event.old_message.author,
-            'time': datetime.datetime.now()
+            
+        message_data = {
+            "guild_id": str(event.guild_id),
+            "channel_id": str(event.channel_id),
+            "message_id": str(event.message_id),
+            "old_content": event.old_message.content,
+            "new_content": event.message.content,
+            "author_id": str(event.author_id) if event.author_id else None
         }
         
-        logger.debug(
-            f"Message edited in channel {event.channel_id} "
-            f"by user {event.old_message.author.username}"
-        )
+        await self.bot.d.api_client.store_edited_message(message_data)
