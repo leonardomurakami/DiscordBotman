@@ -12,6 +12,7 @@ class BasePlugin(ABC):
         self.plugin.description = self.plugin_description
         self.commands: typing.List[BaseCommand] = []
         self._setup_commands()
+        self._register_commands()
         
     @property
     @abstractmethod
@@ -29,6 +30,11 @@ class BasePlugin(ABC):
     def _setup_commands(self) -> None:
         """Initialize plugin commands"""
         pass
+
+    def _register_commands(self) -> None:
+        """Register plugin commands with bot"""
+        for command in self.commands:
+            command.create_command()
             
     def load(self) -> None:
         """Load plugin into bot"""
