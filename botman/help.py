@@ -1,6 +1,7 @@
 import lightbulb
 import hikari
 import logging
+
 from typing import Union
 from views.help_view import HelpView
 
@@ -29,13 +30,10 @@ class HelpCommand(lightbulb.BaseHelpCommand):
         embeds.append(overview)
         labels.append("Overview")
 
-
+        # Create an embed for each plugin
         for plugin in context.bot.plugins.values():
-            logger.info(f"All commands: {plugin.all_commands}")  # Debug log
             if not plugin.all_commands:
                 continue
-                
-            logger.info(f"Processing plugin: {plugin.name}")  # Debug log
 
             embed = hikari.Embed(
                 title=f"{plugin.name} Plugin",
@@ -43,70 +41,60 @@ class HelpCommand(lightbulb.BaseHelpCommand):
                 color=hikari.Color(0x3498db)
             )
 
-            # Filter out non-slash commands
-            commands = [cmd for cmd in plugin.all_commands 
-                    if lightbulb.SlashCommand in cmd.implements]
-            
-            if commands:
-                command_list = []
-                for cmd in commands:
-                    help_text = getattr(cmd, 'help_text', cmd.description)
-                    command_list.append(
-                        f"**{cmd.name}**\n"
-                        f"└ {help_text}\n"
-                        f"└ Usage: {cmd.signature}"
-                    )
-                
-                embed.add_field(
-                    name="Available Commands",
-                    value="\n".join(command_list),
-                    inline=False
-                )
-                
-                embeds.append(embed)
-                labels.append(plugin.name)
 
-        if len(embeds) > 1:  # Only create view if we have plugins to show
-            view = HelpView(embeds, labels, timeout=300.0)
-            response = await context.respond(embed=embeds[0], components=view.build())
-            message = await response.message()
-            view.start(message)  # Start the view with the message
-        else:
-            # If no plugins found, just show the overview
-            await context.respond(embed=embeds[0])
+            commands = [cmd for cmd in plugin.all_commands if not isinstance(cmd, lightbulb.commands.prefix.PrefixCommand)]
+            command_list = []
+            for cmd in commands:
+                command_list.append(
+                    f"**{cmd.name}**\n"
+                    f"└ {cmd.description}\n"
+                    f"└ Usage: {cmd.signature}"
+                )
+            embed.add_field(
+                name=f"Available commands!",
+                value="\n".join(command_list),
+                inline=False
+            )
+
+            embeds.append(embed)
+            labels.append(plugin.name)
+
+        # Send embeds with navigation
+        view = HelpView(embeds, labels, timeout=300.0)
+        response = await context.respond(embed=embeds[0], components=view.build())
+        message = await response.message()
+        context.app.d.miru.start_view(view)
 
     async def send_plugin_help(self, context: lightbulb.Context, plugin: lightbulb.Plugin) -> None:
+        if not plugin.all_commands:
+            await context.respond(
+                hikari.Embed(
+                    title="No commands",
+                    description="This plugin doesn't have any commands",
+                    color=hikari.Color(0xff0000)
+                )
+            )
+
         embed = hikari.Embed(
             title=f"{plugin.name} Plugin",
             description=plugin.description or "No description provided",
             color=hikari.Color(0x3498db)
         )
 
-        # Filter out non-slash commands
+
         commands = [cmd for cmd in plugin.all_commands if not isinstance(cmd, lightbulb.commands.prefix.PrefixCommand)]
-        if commands:
-            command_list = []
-            for cmd in commands:
-                # Get command help text if available
-                help_text = cmd.get_help(context) if hasattr(cmd, 'get_help') else cmd.description
-                
-                command_list.append(
-                    f"**{cmd.name}**\n"
-                    f"└ {help_text}\n"
-                    f"└ Usage: {cmd.signature}"
-                )
-            
-            embed.add_field(
-                name="Available Commands",
-                value="\n".join(command_list),
-                inline=False
+        command_list = []
+        for cmd in commands:
+            command_list.append(
+                f"**{cmd.name}**\n"
+                f"└ {cmd.description}\n"
+                f"└ Usage: {cmd.signature}"
             )
-        else:
-            embed.add_field(
-                name="Commands",
-                value="No commands available",
-                inline=False
-            )
+        embed.add_field(
+            name=f"Available commands!",
+            value="\n".join(command_list),
+            inline=False
+        )
 
         await context.respond(embed=embed)
 
@@ -117,42 +105,38 @@ class HelpCommand(lightbulb.BaseHelpCommand):
             color=hikari.Color(0x3498db)
         )
 
-        # Add command usage
+        # Add basic command info
         embed.add_field(
             name="Usage",
             value=command.signature,
             inline=False
         )
 
-        # Add command options for slash commands
-        if isinstance(command, lightbulb.SlashCommand) and command.options:
-            options_text = []
-            for opt in command.options:
-                opt_text = f"**{opt.name}** - {opt.description}"
-                if opt.required:
-                    opt_text += " *(required)*"
-                options_text.append(opt_text)
-            
-            if options_text:
-                embed.add_field(
-                    name="Options",
-                    value="\n".join(options_text),
-                    inline=False
-                )
+        # Add implementation types
+        if hasattr(command, "implements"):
+            impl_types = [impl.__name__ for impl in command.implements]
+            embed.add_field(
+                name="Command Type",
+                value=", ".join(impl_types),
+                inline=False
+            )
 
-        # Add permissions if any
-        if command.checks:
-            perms = []
-            for check in command.checks:
-                if isinstance(check, lightbulb.checks.has_guild_permissions):
-                    perms.extend(str(perm).replace('_', ' ').title() for perm in check.perms)
-            
-            if perms:
-                embed.add_field(
-                    name="Required Permissions",
-                    value="\n".join(perms),
-                    inline=False
-                )
+        # Add options if it's a slash command
+        if lightbulb.SlashCommand in getattr(command, "implements", []):
+            if command.options:
+                options_text = []
+                for opt in command.options:
+                    opt_text = f"**{opt.name}** - {opt.description}"
+                    if opt.required:
+                        opt_text += " *(required)*"
+                    options_text.append(opt_text)
+                
+                if options_text:
+                    embed.add_field(
+                        name="Options",
+                        value="\n".join(options_text),
+                        inline=False
+                    )
 
         await context.respond(embed=embed)
 
@@ -163,11 +147,10 @@ class HelpCommand(lightbulb.BaseHelpCommand):
             color=hikari.Color(0x3498db)
         )
 
-        for cmd in group.subcommands.values():
-            help_text = cmd.get_help(context) if hasattr(cmd, 'get_help') else cmd.description
+        for cmd in group.subcommands.values():  # This one stays as .values() since it's a different structure
             embed.add_field(
                 name=cmd.name,
-                value=f"Description: {help_text}\nUsage: {cmd.signature}",
+                value=f"Description: {cmd.description}\nUsage: {getattr(cmd, 'usage', 'No usage specified')}",
                 inline=False
             )
 
